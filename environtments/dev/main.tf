@@ -7,6 +7,9 @@ variable "subnet_ip_range" {}
 variable "firewall_name" {}
 variable "vm_name" {}
 variable "machine_type" {}
+variable "boot_disk_image" {}
+variable "boot_disk_type" {}
+variable "boot_disk_size" {}
 
 provider "google" {
   project = var.project_id
@@ -35,5 +38,11 @@ module "compute" {
   vm_name = var.vm_name
   machine_type = var.machine_type
   zone = var.zone
+
+  boot_disk_image = var.boot_disk_image
+  boot_disk_type = var.boot_disk_type
+  boot_disk_size = var.boot_disk_size 
+
+
   subnet_id = module.networking.subnet_id
 }
