@@ -10,6 +10,7 @@ variable "machine_type" {}
 variable "boot_disk_image" {}
 variable "boot_disk_type" {}
 variable "boot_disk_size" {}
+variable "desired_status" {}
 
 provider "google" {
   project = var.project_id
@@ -38,6 +39,7 @@ module "compute" {
   vm_name = var.vm_name
   machine_type = var.machine_type
   zone = var.zone
+  desired_status = var.desired_status
 
   boot_disk_image = var.boot_disk_image
   boot_disk_type = var.boot_disk_type
