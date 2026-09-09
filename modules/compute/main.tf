@@ -5,7 +5,7 @@ resource "google_compute_instance" "vm" {
 
   # TAMBAHKAN BARIS INI
   # Menginstruksikan GCP agar memastikan VM dalam keadaan mati (berhenti)
-  desired_status = "TERMINATED"
+  desired_status = var.desired_status
 
   boot_disk {
     initialize_params {

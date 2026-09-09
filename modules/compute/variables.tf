@@ -29,3 +29,8 @@ variable "boot_disk_size" {
   type = number
   default = 10
 }
+
+variable "desired_status" {
+  type = string
+  default = "Running"
+}
