@@ -30,7 +30,31 @@ variable "boot_disk_size" {
   default = 10
 }
 
+variable "boot_disk_labels" {
+  description = "Label tambahan khusus untuk boot disk"
+  type        = map(string)
+  default     = {} # Default kosong jika tidak ada label khusus
+}
+
 variable "desired_status" {
   type = string
   default = "Running"
+}
+
+# Modifikasi daftar disk agar bisa menerima label khusus secara opsional
+variable "additional_disks" {
+  description = "Daftar additional disk yang akan dibuat dan dipasang ke VM"
+  type = map(object({
+    type = string
+    size = number
+    labels = optional(map(string), {}) # <- Fitur opsional!
+  }))
+  default = {} # Default kosong (0 disk) jika tidak diisi
+}
+
+# Variabel untuk Label Umum (berlaku untuk VM dan semua disk-nya)
+variable "labels" {
+  description = "Label umum untuk semua resource"
+  type        = map(string)
+  default     = {}
 }
