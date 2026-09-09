@@ -35,17 +35,17 @@ module "firewall" {
 }
 
 # panggil modul compute (ambil ID Subnet dari modul networking)
-module "compute" {
-  source = "../../modules/compute"
-  vm_name = var.vm_name
-  machine_type = var.machine_type
-  zone = var.zone
-  desired_status = var.desired_status
+# module "compute" {
+#   source = "../../modules/compute"
+#   vm_name = var.vm_name
+#   machine_type = var.machine_type
+#   zone = var.zone
+#   desired_status = var.desired_status
 
-  boot_disk_image = var.boot_disk_image
-  boot_disk_type = var.boot_disk_type
-  boot_disk_size = var.boot_disk_size 
+#   boot_disk_image = var.boot_disk_image
+#   boot_disk_type = var.boot_disk_type
+#   boot_disk_size = var.boot_disk_size 
 
 
-  subnet_id = module.networking.subnet_id
-}
+#   subnet_id = module.networking.subnet_id
+# }
