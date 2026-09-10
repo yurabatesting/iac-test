@@ -45,7 +45,7 @@ module "compute" {
   desired_status = var.desired_status
 
   # Lempar map disk tambahan
-  additional_disks = var.additional_disks
+  # additional_disks = var.additional_disks
 
   boot_disk_image = var.boot_disk_image
   boot_disk_type = var.boot_disk_type
