@@ -21,20 +21,20 @@ provider "google" {
 }
 
 # panggil modul networking
-module "networking" {
-  source = "../../modules/networking"
-  network_name = var.network_name
-  subnet_name = var.subnet_name
-  subnet_ip_range = var.subnet_ip_range
-  region = var.region
-}
+# module "networking" {
+#   source = "../../modules/networking"
+#   network_name = var.network_name
+#   subnet_name = var.subnet_name
+#   subnet_ip_range = var.subnet_ip_range
+#   region = var.region
+# }
 
 # panggil modul firewall (ambil ID VPC dari module networking)
-module "firewall" {
-  source = "../../modules/firewall"
-  firewall_name = var.firewall_name
-  network_id = module.networking.network_id
-}
+# module "firewall" {
+#   source = "../../modules/firewall"
+#   firewall_name = var.firewall_name
+#   network_id = module.networking.network_id
+# }
 
 # panggil modul compute (ambil ID Subnet dari modul networking)
 module "compute" {
