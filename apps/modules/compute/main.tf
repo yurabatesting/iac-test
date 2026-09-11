@@ -34,6 +34,10 @@ resource "google_compute_instance" "vm" {
   machine_type = var.machine_type
   zone         = var.zone
 
+  hostname            = var.hostname
+  tags                = var.network_tags
+  deletion_protection = var.deletion_protection
+
   # TAMBAHKAN BARIS INI
   # Menginstruksikan GCP agar memastikan VM dalam keadaan mati (berhenti)
   desired_status = var.desired_status
@@ -55,10 +59,47 @@ resource "google_compute_instance" "vm" {
   network_interface {
     # vm dipasang ke subnet yg dikirim dari module networking
     subnetwork = var.subnet_id
-    # Block ini dikosongkan agar VM tidak mendapat IP Publik (lebih aman)
-    # Anda tetap bisa SSH via IAP karena firewall sudah dibuka
-    # access_config { }
+    
+    # Blok access_config hanya dibuat jika assign_external_ip = true
+    dynamic "access_config" {
+      for_each = var.assign_external_ip ? [1] : []
+      content {
+        network_tier = var.network_tier
+      }
+    }
   }
+
+  # Mengelola identitas VM (Workload Identity di level Compute Engine)
+  service_account {
+    email  = var.service_account_email
+    scopes = var.access_scopes
+  }
+
+  shielded_instance_config {
+    enable_secure_boot          = var.enable_secure_boot
+    enable_vtpm                 = var.enable_vtpm
+    enable_integrity_monitoring = var.enable_integrity_monitoring
+  }
+
+  # Automation
+  metadata_startup_script = var.startup_script
+
+  # Metadata dikompilasi menggunakan fungsi merge()
+  # Konversi boolean Terraform menjadi string metadata GCP
+  metadata = merge(
+    {
+      "enable-oslogin"         = var.enable_oslogin ? "TRUE" : "FALSE"
+      "enable-oslogin-2fa"     = var.enable_oslogin_2fa ? "TRUE" : "FALSE"
+      "block-project-ssh-keys" = var.block_project_ssh_keys ? "TRUE" : "FALSE"
+      "install-ops-agent"      = var.install_ops_agent
+    },
+    
+    # Hanya tambahkan ssh-keys jika nilainya tidak kosong
+    var.ssh_keys != null ? { "ssh-keys" = var.ssh_keys } : {},
+    
+    # Gabungkan dengan metadata tambahan lainnya jika ada
+    var.custom_metadata
+  )
 
   labels = var.labels # VM mendapatkan label umum
 }
