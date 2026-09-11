@@ -1,25 +1,41 @@
 locals {
-  # Memecah 1 member dengan 3 role menjadi 3 kombinasi data yang berbeda
   iam_flat = flatten([
     for key, data in var.iam_members : [
       for role in data.roles : {
-        # Membuat ID unik untuk perulangan (misal: "user:budi@x.com=>roles/viewer")
         unique_key = "${data.member}=>${role}"
         member     = data.member
         role       = role
       }
     ]
   ])
+  
+  # Mengubah hasil flat menjadi Map untuk for_each
+  iam_map = { for item in local.iam_flat : item.unique_key => item }
 }
 
-resource "google_project_iam_member" "project_members" {
-  # Mengubah hasil flatten (List) kembali menjadi Map agar bisa di-looping
-  for_each = { for item in local.iam_flat : item.unique_key => item }
-  
-  # 2. Panggil atribut project menggunakan hasil tangkapan data source
-  project = var.project_id
+# 1. Jika target_type == "project", jalankan blok ini. Jika bukan, abaikan ({}).
+resource "google_project_iam_member" "project" {
+  for_each = var.target_type == "project" ? local.iam_map : {}
 
-  # Atribut project dihapus. Terraform akan otomatis mengambil dari blok provider
+  project = var.target_id
+  role    = each.value.role
+  member  = each.value.member
+}
+
+# 2. Jika target_type == "folder", jalankan blok ini.
+resource "google_folder_iam_member" "folder" {
+  for_each = var.target_type == "folder" ? local.iam_map : {}
+
+  folder = var.target_id
   role   = each.value.role
   member = each.value.member
-} 
+}
+
+# 3. Jika target_type == "organization", jalankan blok ini.
+resource "google_organization_iam_member" "org" {
+  for_each = var.target_type == "organization" ? local.iam_map : {}
+
+  org_id = var.target_id
+  role   = each.value.role
+  member = each.value.member
+}
