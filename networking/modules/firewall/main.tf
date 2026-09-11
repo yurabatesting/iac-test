@@ -1,10 +1,15 @@
-# resource "google_compute_firewall" "allow_iap_ssh" {
-#   name    = var.firewall_name
-#   network = var.network_id
-
-#   allow {
-#     protocol = "tcp"
-#     ports    = ["22"]
-#   }
-#   source_ranges = ["35.235.240.0/20"]
-# }
+resource "google_compute_firewall" "firewall" {
+    for_each        = var.firewall
+    name            = each.value.firewall_name
+    source_ranges   = each.value.source_ranges
+    
+    network         = var.available_vpc[each.value.vpc_key]
+    
+    dynamic "allow" {
+      for_each = each.value.allow
+      content {
+        protocol = allow.value.protocol
+        ports = allow.value.ports
+      }
+    }
+}

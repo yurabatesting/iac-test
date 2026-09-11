@@ -1,18 +1,27 @@
-variable "firewall_name" {
-  type = string
-}
+# variable "firewall_name" {
+#   type = string
+# }
 
-# menerima ID VPC dari modul networking
-variable "network_id" {
-  type = string
-}
+# # menerima ID VPC dari modul networking
+# variable "network_id" {
+#   type = string
+# }
 
-variable "additional_disks" {
-  description = "Daftar additional disk yang akan dibuat dan dipasang ke VM"
+variable "firewall" {
+  description = "Template untuk membuat Firewall"
   type = map(object({
-    type = string
-    size = number
-    labels = optional(map(string), {}) # <- Fitur opsional!
+    firewall_name = string
+    vpc_key = string
+    source_ranges = list(string)
+    allow = list(object({
+      protocol = string
+      ports = list(string)
+    }))
   }))
-  default = {} # Default kosong (0 disk) jika tidak diisi
+}
+
+# Variabel baru untuk menampung lemparan output dari Modul VPC
+variable "available_vpc" {
+  description = "Daftar VPC yang tersedia dari modul network"
+  type        = map(string) 
 }
