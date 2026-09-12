@@ -1,47 +1,74 @@
+# Basic information 
 variable "vm_name" {
   type = string
 }
+variable "desired_status" {
+  type = string
+  default = "Running"
+}
+variable "zone" {
+  type = string
+}
+# Deletion Protection
+variable "deletion_protection" {
+  type    = bool
+  default = false 
+}
 
+
+# ===============================================================================================
+# Konfigurasi Machine Type
 variable "machine_type" {
   type = string
 }
 
-variable "zone" {
-  type = string
-}
 
+# ===============================================================================================
+# Konfigurasi Networking
 # menerima ID subnet dari module networking
 variable "subnet_id" {
   type = string
 }
+# External IP & Network Service Tier
+variable "assign_external_ip" {
+  type    = bool
+  default = false # Default aman: Tanpa IP Publik
+}
+variable "network_tier" {
+  type    = string
+  default = "PREMIUM"
+}
+# Network Tags
+variable "network_tags" {
+  type    = list(string)
+  default = []
+}
+# Hostname
+variable "hostname" {
+  type    = string
+  default = null
+}
 
+
+# ===============================================================================================
+# Konfigurasi Storage
 variable "boot_disk_image" {
   type = string
   default = "ubuntu-os-cloud/ubuntu-2204-lts"
 }
-
 variable "boot_disk_type" {
   type = string
   default = "pd-standard"
 }
-
 variable "boot_disk_size" {
   type = number
   default = 10
 }
-
 variable "boot_disk_labels" {
   description = "Label tambahan khusus untuk boot disk"
   type        = map(string)
   default     = {} # Default kosong jika tidak ada label khusus
 }
-
-variable "desired_status" {
-  type = string
-  default = "Running"
-}
-
-# Modifikasi daftar disk agar bisa menerima label khusus secara opsional
 variable "additional_disks" {
   description = "Daftar additional disk yang akan dibuat dan dipasang ke VM"
   type = map(object({
@@ -52,63 +79,9 @@ variable "additional_disks" {
   default = {} # Default kosong (0 disk) jika tidak diisi
 }
 
-# Variabel untuk Label Umum (berlaku untuk VM dan semua disk-nya)
-variable "labels" {
-  description = "Label umum untuk semua resource"
-  type        = map(string)
-  default     = {}
-}
 
-
-# 1. VM Provisioning Model (STANDARD atau SPOT)
-variable "provisioning_model" {
-  type    = string
-  default = "STANDARD" 
-}
-
-# 2. Network Tags
-variable "network_tags" {
-  type    = list(string)
-  default = []
-}
-
-# 3. Hostname
-variable "hostname" {
-  type    = string
-  default = null
-}
-
-# 4 & 5. External IP & Network Service Tier
-variable "assign_external_ip" {
-  type    = bool
-  default = false # Default aman: Tanpa IP Publik
-}
-variable "network_tier" {
-  type    = string
-  default = "PREMIUM"
-}
-
-# 6 & 15. Ops Agent & Custom Metadata
-variable "install_ops_agent" {
-  type    = string
-  default = "TRUE" # Ops Agent otomatis terinstal via metadata
-}
-variable "custom_metadata" {
-  type    = map(string)
-  default = {}
-}
-
-# 7 & 8. Service Account & Access Scope (Mengelola Workload Identity VM)
-variable "service_account_email" {
-  type    = string
-  default = null # Jika null, menggunakan Default Compute SA
-}
-variable "access_scopes" {
-  type    = list(string)
-  default = ["https://www.googleapis.com/auth/cloud-platform"] # Full akses API (aman selama SA-nya dibatasi IAM)
-}
-
-# 10. Shielded VM
+# ===============================================================================================
+# Konfigurasi Shielded VM
 variable "enable_secure_boot" {
   type    = bool
   default = false
@@ -121,8 +94,7 @@ variable "enable_integrity_monitoring" {
   type    = bool
   default = true
 }
-
-# 11 & 12. VM Access (OS Login) & Manual SSH Key
+# VM Access (OS Login) & Manual SSH Key
 variable "enable_oslogin" {
   description = "Control VM access through IAM permissions"
   type    = bool
@@ -144,14 +116,42 @@ variable "ssh_keys" {
   default = null
 }
 
-# 13. Deletion Protection
-variable "deletion_protection" {
-  type    = bool
-  default = false 
+
+# ===============================================================================================
+# Konfigurasi Service Account & Access Scope (Mengelola Workload Identity VM)
+variable "service_account_email" {
+  type    = string
+  default = null # Jika null, menggunakan Default Compute SA
+}
+variable "access_scopes" {
+  type    = list(string)
+  default = ["https://www.googleapis.com/auth/cloud-platform"] # Full akses API (aman selama SA-nya dibatasi IAM)
 }
 
-# 14. Automation (Startup Script)
+
+# ===============================================================================================
+# Variabel untuk Label Umum (berlaku untuk VM dan semua disk-nya)
+variable "labels" {
+  description = "Label umum untuk semua resource"
+  type        = map(string)
+  default     = {}
+}
+variable "install_ops_agent" {
+  type    = string
+  default = "TRUE" # Ops Agent otomatis terinstal via metadata
+}
+variable "custom_metadata" {
+  type    = map(string)
+  default = {}
+}
 variable "startup_script" {
   type    = string
   default = null
 }
+
+
+
+
+
+
+
