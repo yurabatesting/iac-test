@@ -13,3 +13,31 @@ resource "google_compute_subnetwork" "subnet" {
   region = var.region
   network = google_compute_network.vpc[each.value.vpc_key].id
 }
+
+# 1. Mengalokasikan IP (Mendukung pembuatan multiple IP dan manual IP)
+resource "google_compute_global_address" "psa_range" {
+  for_each = { for item in local.psa_list : "${item.vpc_key}-${item.range_name}" => item }
+
+  name          = each.value.range_name
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  network       = google_compute_network.vpc[each.value.vpc_key].id
+
+  # Memasukkan rentang IP manual jika didefinisikan
+  address       = each.value.address
+  prefix_length = each.value.prefix_length
+}
+
+# 2. Membuat 1 koneksi peering per VPC ke Google Services
+resource "google_service_networking_connection" "private_vpc_connection" {
+  # Hanya eksekusi pada VPC yang memiliki konfigurasi psa_ranges
+  for_each = { for k, v in var.vpc : k => v if length(v.psa_ranges) > 0 }
+
+  network                 = google_compute_network.vpc[each.key].id
+  service                 = "servicenetworking.googleapis.com"
+  
+  # Mengambil semua nama range IP yang ada di VPC ini dan menggabungkannya
+  reserved_peering_ranges = [for psa in each.value.psa_ranges : psa.name]
+
+  depends_on = [google_compute_global_address.psa_range]
+}

@@ -19,6 +19,13 @@ variable "vpc" {
   type = map(object({
     vpc_name = string
     auto_create_subnetworks = bool
+    
+    # Mengganti enable_psa dengan konfigurasi daftar rentang IP PSA
+    psa_ranges = optional(list(object({
+      name          = string
+      address       = optional(string)       # Opsional: Jika kosong, Google akan memberikan IP acak
+      prefix_length = optional(number, 24)   # Opsional: Default otomatis menggunakan /24
+    })), []) # Default berupa list kosong [] jika atribut ini tidak ditulis di .tfvars
   }))
 }
 
