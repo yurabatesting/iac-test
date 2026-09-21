@@ -14,6 +14,24 @@ resource "google_compute_subnetwork" "subnet" {
   network = google_compute_network.vpc[each.value.vpc_key].id
 }
 
+# ------------------------------------------------------------------------
+# BLOK PRIVATE SERVICES ACCESS (PSA)
+# ------------------------------------------------------------------------
+
+# Meratakan (flatten) daftar PSA dari seluruh VPC untuk diiterasi
+locals {
+  psa_list = flatten([
+    for vpc_key, vpc_val in var.vpc : [
+      for psa in vpc_val.psa_ranges : {
+        vpc_key       = vpc_key
+        range_name    = psa.name
+        address       = psa.address
+        prefix_length = psa.prefix_length
+      }
+    ]
+  ])
+}
+
 # 1. Mengalokasikan IP (Mendukung pembuatan multiple IP dan manual IP)
 resource "google_compute_global_address" "psa_range" {
   for_each = { for item in local.psa_list : "${item.vpc_key}-${item.range_name}" => item }
