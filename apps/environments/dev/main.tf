@@ -12,6 +12,10 @@ variable "additional_disks" {}
 variable "labels" {}
 variable "existing_subnet_name" {}
 
+variable "cloudsql" {}
+
+# ========================================================================
+
 provider "google" {
   project = var.project_id
   region = var.region
@@ -47,3 +51,16 @@ module "compute" {
   labels = var.labels
 }
 
+
+# 2. Panggil modul Cloud SQL
+module "cloudsql" {
+  source = "../../modules/cloud-sql"
+  
+  # Menginjeksi ID VPC secara dinamis dari atribut 'network' milik data subnet.
+  # Ini mencegah Anda harus melakukan hardcode link VPC di dalam file .tfvars.
+  cloudsql = {
+    for k, v in var.cloudsql : k => merge(v, {
+      network_id = data.google_compute_subnetwork.app_subnet.network
+    })
+  }
+}
