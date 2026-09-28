@@ -1,18 +1,10 @@
 variable "project_id" {}
 variable "region" {}
-# variable "zone" {}
-# variable "vm_name" {}
-# variable "machine_type" {}
-# variable "boot_disk_image" {}
-# variable "boot_disk_type" {}
-# variable "boot_disk_size" {}
-# variable "boot_disk_labels" {}
-# variable "desired_status" {}
-# variable "additional_disks" {}
-# variable "labels" {}
 variable "existing_subnet_name" {}
-# variable "vms" {}
 variable "cloudsql" {}
+variable "buckets" {
+  type = any 
+}
 
 # ========================================================================
 
@@ -74,10 +66,7 @@ data "google_compute_subnetwork" "app_subnet" {
 #   startup_script              = each.value.startup_script
 # }
 
-
-
-
-
+# ========================================================================
 
 # # 2. Panggil modul Cloud SQL
 # module "cloudsql" {
@@ -91,3 +80,13 @@ data "google_compute_subnetwork" "app_subnet" {
 #     })
 #   }
 # }
+
+# ========================================================================
+
+# 3. TAMBAHKAN INI: Panggil modul Cloud Storage
+module "cloud_storage" {
+  # Pastikan path ini sesuai dengan letak folder modul Anda
+  source = "../../modules/cloud-storage"
+  
+  buckets = var.buckets
+}
