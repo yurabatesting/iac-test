@@ -102,4 +102,9 @@ resource "google_storage_bucket" "bucket" {
       not_found_page   = each.value.website.not_found_page
     }
   }
+
+  # TAMBAHKAN BLOK INI DI BAGIAN BAWAH
+  lifecycle {
+    prevent_destroy = true
+  }
 }

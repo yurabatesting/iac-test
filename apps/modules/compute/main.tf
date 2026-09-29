@@ -108,5 +108,15 @@ resource "google_compute_instance" "vm" {
     var.custom_metadata
   )
   labels = var.labels # VM mendapatkan label umum
+
+
+  # TAMBAHKAN BLOK INI DI BAGIAN BAWAH
+  lifecycle {
+    prevent_destroy = true
+    
+    # Sangat disarankan menambahkan ignore_changes untuk attached_disk 
+    # atau metadata jika sering diubah di luar Terraform
+    # ignore_changes = [metadata] 
+  }
 }
 

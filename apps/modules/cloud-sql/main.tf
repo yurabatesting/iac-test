@@ -99,6 +99,7 @@ resource "google_sql_database_instance" "instance" {
 
   # Mengabaikan perubahan flag di luar Terraform (menghindari error configuration drift)
   lifecycle {
+    prevent_destroy = true
     ignore_changes = [
       settings[0].database_flags
     ]

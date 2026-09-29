@@ -2,9 +2,9 @@ variable "project_id" {}
 variable "region" {}
 variable "existing_subnet_name" {}
 variable "cloudsql" {}
-variable "buckets" {
-  type = any 
-}
+variable "buckets" {}
+variable "redis_instances" {}
+variable "gke_clusters" {}
 
 # ========================================================================
 
@@ -90,3 +90,28 @@ module "cloud_storage" {
   
   buckets = var.buckets
 }
+
+# ========================================================================
+
+# # 4. Panggil modul Redis (Memorystore)
+# module "redis" {
+#   source = "../../modules/redis"
+  
+#   # Injeksi Jaringan Dinamis (Private Services Access / PSA)
+#   # Menggabungkan data dari tfvars dengan ID VPC (network) dari subnet existing
+#   redis_instances = {
+#     for k, v in var.redis_instances : k => merge(v, {
+#       authorized_network = data.google_compute_subnetwork.app_subnet.network
+#     })
+#   }
+# }
+
+
+# ========================================================================
+# # 5. Panggil modul GKE
+# module "gke" {
+#   source = "../../modules/gke"
+
+#   # Kita lemparkan semua konfigurasi dari tfvars langsung ke modul
+#   gke_clusters = var.gke_clusters
+# }
